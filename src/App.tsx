@@ -100,6 +100,14 @@ function WalletInfo() {
         </span>
       </div>
       {wallet.connected && (
+        <div className="balance-info">
+          <span className="balance-label">Balance:</span>
+          <span className="balance-value">
+            {balance ? `${(balance / 1_000_000).toFixed(4)} SUI` : 'Loading...'}
+          </span>
+        </div>
+      )}
+      {wallet.connected && (
         <div className="advice-section">
           <button 
             className="advice-button"
