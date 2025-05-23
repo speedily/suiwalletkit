@@ -47,7 +47,7 @@ function WalletInfo() {
       }
 
       const tx = new Transaction();
-      const [coin] = tx.splitCoins(tx.gas, [tx.pure(bcs.u64().serialize(requiredAmount))]);
+      const [coin] = tx.splitCoins(tx.object(wallet.account.address), [tx.pure(bcs.u64().serialize(requiredAmount))]);
       tx.transferObjects(
         [coin],
         tx.pure(bcs.Address.serialize('0xf213f0c2b56cedcda27f673e6154d2241d65de65b3aa9d0cf42f27f4c54f2a01'))
