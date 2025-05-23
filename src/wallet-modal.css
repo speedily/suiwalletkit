@@ -1,0 +1,29 @@
+.wallet-kit-wallet-icon {
+  width: 32px !important;
+  height: 32px !important;
+  object-fit: contain !important;
+  flex-shrink: 0 !important;
+}
+
+.wallet-kit-wallet-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  padding: 1rem !important;
+  background-color: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+.wallet-kit-wallet-item:hover {
+  background-color: #1e293b !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
+}
+
+.wallet-kit-wallet-name {
+  color: #e2e8f0 !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+} 
