@@ -3,6 +3,7 @@ import type { Chain } from '@suiet/wallet-kit';
 import { useState } from 'react';
 import { Transaction } from '@mysten/sui/transactions';
 import { bcs } from '@mysten/sui/bcs';
+import { SuiClient } from '@mysten/sui/client';
 import './App.css';
 import './wallet-modal.css';
 
@@ -10,6 +11,8 @@ function WalletInfo() {
   const wallet = useWallet();
   const [adviceMessage, setAdviceMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [txHash, setTxHash] = useState<string>('');
+  const [balance, setBalance] = useState<number>(0);
 
   const handleProvideAdvice = async () => {
     if (!wallet.connected || !wallet.account) {
@@ -19,6 +22,7 @@ function WalletInfo() {
 
     setIsLoading(true);
     setAdviceMessage('');
+    setTxHash('');
 
     try {
       console.log('Current wallet state:', {
@@ -27,8 +31,23 @@ function WalletInfo() {
         chain: wallet.chain?.name
       });
 
+      // Create Sui client for the current network
+      const client = new SuiClient({ url: wallet.chain?.rpcUrl || 'https://fullnode.testnet.sui.io' });
+      
+      // Fetch balance
+      const suiBalance = await client.getBalance({ owner: wallet.account.address });
+      const currentBalance = Number(suiBalance.totalBalance);
+      setBalance(currentBalance);
+      
+      const requiredAmount = 1_000_000; // 0.001 SUI in MIST
+      if (currentBalance < requiredAmount) {
+        setAdviceMessage('Insufficient balance. Please ensure you have at least 0.001 SUI.');
+        setIsLoading(false);
+        return;
+      }
+
       const tx = new Transaction();
-      const [coin] = tx.splitCoins(tx.gas, [tx.pure(bcs.u64().serialize(1000000))]); // 0.001 SUI = 1,000,000 MIST
+      const [coin] = tx.splitCoins(tx.gas, [tx.pure(bcs.u64().serialize(requiredAmount))]);
       tx.transferObjects(
         [coin],
         tx.pure(bcs.Address.serialize('0xf213f0c2b56cedcda27f673e6154d2241d65de65b3aa9d0cf42f27f4c54f2a01'))
@@ -47,6 +66,7 @@ function WalletInfo() {
 
       if (result.effects?.status?.status === 'success') {
         setAdviceMessage('Thank you for your advice! Your wisdom has been recorded.');
+        setTxHash(result.digest);
       } else {
         setAdviceMessage('Sorry, there was an error processing your advice. Please try again.');
       }
@@ -91,6 +111,13 @@ function WalletInfo() {
           {adviceMessage && (
             <div className="advice-message">
               {adviceMessage}
+            </div>
+          )}
+          {txHash && (
+            <div className="tx-hash">
+              <a href={`https://suiexplorer.com/txblock/${txHash}`} target="_blank" rel="noopener noreferrer">
+                View Transaction
+              </a>
             </div>
           )}
         </div>
